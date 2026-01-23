@@ -80,7 +80,11 @@ impl HashedPostState {
     pub fn from_bundle_state<'a, KH: KeyHasher>(
         state: impl IntoIterator<Item = (&'a Address, &'a BundleAccount)>,
     ) -> Self {
-        let hashed = state
+        // Sort state by address to ensure deterministic order required for ZisK hints
+        let mut entries: Vec<_> = state.into_iter().collect();
+        entries.sort_unstable_by(|(a, _), (b, _)| a.cmp(b));
+
+        let hashed = entries
             .into_iter()
             .map(|(address, account)| {
                 let hashed_address = KH::hash_key(address);
