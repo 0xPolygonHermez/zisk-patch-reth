@@ -425,9 +425,15 @@ impl HashedStorage {
         status: AccountStatus,
         storage: impl IntoIterator<Item = (&'a U256, &'a U256)>,
     ) -> Self {
+        // Sort storage by key to ensure deterministic order required for ZisK hints
+        let mut entries: Vec<_> = storage.into_iter().collect();
+        entries.sort_unstable_by(|(a, _), (b, _)| a.cmp(b));
+
         Self::from_iter(
             status.was_destroyed(),
-            storage.into_iter().map(|(key, value)| (keccak256(B256::from(*key)), *value)),
+            entries
+                .into_iter()
+                .map(|(key, value)| (keccak256(B256::from(*key)), *value)),
         )
     }
 
