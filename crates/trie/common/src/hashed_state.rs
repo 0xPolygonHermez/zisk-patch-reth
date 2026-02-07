@@ -77,7 +77,7 @@ impl HashedPostState {
         state: impl IntoIterator<Item = (&'a Address, &'a BundleAccount)>,
     ) -> Self {
         state
-            .into_iter()
+            .into_iter().sorted_unstable_by_key(|(addr, _)| *addr)
             .map(|(address, account)| {
                 let hashed_address = KH::hash_key(address);
                 let hashed_account = account.info.as_ref().map(Into::into);
@@ -477,7 +477,7 @@ impl HashedStorage {
     ) -> Self {
         Self::from_iter(
             status.was_destroyed(),
-            storage.into_iter().map(|(key, value)| (keccak256(B256::from(*key)), *value)),
+            storage.into_iter().sorted_unstable_by_key(|(key, _)| *key).map(|(key, value)| (keccak256(B256::from(*key)), *value)),
         )
     }
 
