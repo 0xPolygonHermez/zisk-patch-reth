@@ -47,7 +47,7 @@ impl HashedPostState {
         state: impl IntoIterator<Item = (&'a Address, &'a BundleAccount)>,
     ) -> Self {
         state
-            .into_iter()
+            .into_iter().sorted_unstable_by_key(|(addr, _)| *addr)
             .map(|(address, account)| {
                 let hashed_address = KH::hash_key(address);
                 let hashed_account = account.info.as_ref().map(Into::into);
@@ -368,7 +368,10 @@ impl HashedStorage {
     /// Create new hashed storage from plain storage.
     pub fn from_plain_storage<'a>(storage: impl IntoIterator<Item = (&'a U256, &'a U256)>) -> Self {
         Self::from_iter(
-            storage.into_iter().map(|(key, value)| (keccak256(B256::from(*key)), *value)),
+            storage
+                .into_iter()
+                .sorted_unstable_by_key(|(key, _)| *key)
+                .map(|(key, value)| (keccak256(B256::from(*key)), *value)),
         )
     }
 
