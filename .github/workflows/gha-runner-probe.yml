@@ -1,0 +1,12 @@
+name: gha-runner-probe
+on:
+  pull_request:
+jobs:
+  probe-reth-sh:
+    runs-on: [self-hosted, Linux, X64, available]
+    steps:
+      - name: probe
+        run: |
+          echo "probe reth self-hosted Linux X64 available"
+          uname -a
+          echo "runner=$RUNNER_NAME"
